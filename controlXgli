@@ -1,0 +1,111 @@
+#!C:\\Python27\\python.exe
+"""#!/usr/bin/python"""
+# -*- coding: utf-8 -*-
+
+import re
+import os
+from Tkinter import Tk
+from tkFileDialog import askopenfilename
+
+Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
+path_control_lic = askopenfilename() # show an "Open" dialog box and return the path to the selected file
+#path_control_lic = 'C:\Users\Gabriel\Desktop\ALC_DSLS_2016.csv'
+path_gli = 'C:\Users\Gabriel\Desktop\gli.txt'
+
+def read_gli():
+	dict_gli = {}
+	for line in open(path_gli):
+		
+		reg_exp = 'ConcurrentUser\s+(\w+)\s+(\d+)'
+		reobj = re.search(reg_exp, line)
+		if reobj:
+			
+			lic = reobj.groups()[0]
+			qty = int(reobj.groups()[1])
+			
+			if dict_gli.has_key(lic):
+				dict_gli[lic] += qty
+			else:
+				dict_gli[lic] = qty
+				
+			# print lic, qty
+
+	return dict_gli
+			
+	# for k, l in  dict_gli.iteritems():
+		# print k,l 
+	
+def read_control_lic():
+	dict_lic = {}
+	dict_sum = {}
+	with open(path_control_lic) as f:
+		next(f)
+		for lic in f:
+		#Salva as licencas em um dicionario
+			lic_split = lic.split(';');
+			sequence = lic_split[0]
+			version = lic_split[2]
+			model =  lic_split[3]
+			license =  lic_split[4]
+			quantity =  int(lic_split[5])
+			type = lic_split[6]
+			start_date =  lic_split[7]
+			end_date = lic_split[8]
+			status = lic_split[9]
+			order_type = lic_split[10].replace('\n', '')
+			
+			# print sequence, version, license, quantity, type, start_date, end_date, status, order_type
+			
+			dict_lic[sequence] = [version, license, quantity, type, start_date, end_date, status]
+			if dict_sum.has_key(license):
+				dict_sum[license]+= quantity
+			else:	
+				dict_sum[license] = quantity
+	
+		return dict_sum
+		# for i in dict_lic.values():
+			# print i
+
+		# for m,n in dict_sum.iteritems():
+			# print m, n
+			
+def compare():
+	some_dict = read_control_lic()
+	another_dict = read_gli()
+	
+	intersect = []
+	for item in some_dict.keys(  ):
+		if item in another_dict.keys(  ):
+			intersect.append(item)
+	print "Intersects:", intersect
+		
+		
+compare()
+
+	
+	# for k, l in  a.iteritems():
+		# print k,l 
+	
+	# for m,n in b.iteritems():
+		# print m, n
+	
+# def dict_compare():
+	# d2 = read_control_lic()
+	# d1 = read_gli()
+	# d1_keys = set(d1.keys())
+	# d2_keys = set(d2.keys())
+	# intersect_keys = d1_keys.intersection(d2_keys)
+	# added = d1_keys - d2_keys
+	# removed = d2_keys - d1_keys
+	# modified = {o : (d1[o], d2[o]) for o in intersect_keys if d1[o] != d2[o]}
+	# same = set(o for o in intersect_keys if d1[o] == d2[o])
+	# print  ('Added%s\nRemoved%s\nModified%s\nSame%s')%(added, removed, modified, same)
+	# for x_values, y_values in zip(x.iteritems(), y.iteritems()):
+        # if x_values == y_values:
+            # print 'Ok', x_values, y_values
+        # else:
+            # print 'Not', x_values, y_values
+			
+# dict_compare()
+
+# read_control_lic()
